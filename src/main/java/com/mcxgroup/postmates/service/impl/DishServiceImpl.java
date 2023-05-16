@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -56,16 +57,15 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     @Override
     @Transactional
     public void saveWithFlavor(DishDto dishDto){
-        // 添加菜品
-        this.save(dishDto);
-        // 偏好
+        this.save(dishDto);//直接就可以保存基本的信息了，dsishDTO是子类
+        Long dishDtoId = dishDto.getId();
         List<DishFlavor> flavors = dishDto.getFlavors();
 
-        for (DishFlavor flavor : flavors) {
-            flavor.setDishId(dishDto.getId());
-        }
+        flavors = flavors.stream().map((item) -> {
+            item.setDishId(dishDtoId);
+            return item;
+        }).collect(Collectors.toList());
 
-        // 批量保存菜品偏好
-        dishFlavorService.saveBatch(flavors);
+        dishFlavorService.saveBatch(flavors);//口味表只有name没有dishId
     }
 }

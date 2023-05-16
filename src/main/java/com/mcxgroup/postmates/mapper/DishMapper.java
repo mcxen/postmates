@@ -1,6 +1,7 @@
 package com.mcxgroup.postmates.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.mcxgroup.postmates.dto.DishDto;
 import com.mcxgroup.postmates.entity.Dish;
 import org.apache.ibatis.annotations.Mapper;
 
