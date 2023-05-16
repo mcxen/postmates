@@ -23,4 +23,4 @@ mybatis-plus:
 # 外卖项目的图片存放地址
 takeout-food:
   # 这里目前使用的是是绝对路径
-  images: static/upload/
+  images: /Users/mcxw/Downloads/postmates/static/upload/

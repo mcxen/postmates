@@ -23,4 +23,11 @@ public class GlobalExceptionHandler {
         }
         return R.error("未知错误。");
     }
+    @ExceptionHandler(CustomException.class)
+    public R<String> exceptionHandler(CustomException ex){
+        //上面写一个，下面就会注入一个进来
+        log.error(ex.getMessage());
+        return R.error(ex.getMessage());
+        //返回到页面
+    }
 }
