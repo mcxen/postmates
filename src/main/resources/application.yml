@@ -1,0 +1,26 @@
+server:
+  port: 8080
+spring:
+  application:
+    #应用的名称，可选
+    name: postmates
+  datasource:
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/postmates?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+      username: root # 数据库用户名
+      password: Mysql2486    # 数据库密码
+
+
+mybatis-plus:
+  configuration:
+    #在映射实体或者属性时，将数据库中表名和字段名中的下划线去掉，按照驼峰命名法映射
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: ASSIGN_ID
+# 外卖项目的图片存放地址
+takeout-food:
+  # 这里目前使用的是是绝对路径
+  images: static/upload/
