@@ -15,13 +15,17 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
         log.info("公共字段填充");
         log.info(metaObject.toString());
         metaObject.setValue("createTime", LocalDateTime.now());
-
+        metaObject.setValue("updateTime",LocalDateTime.now());
+        metaObject.setValue("createUser",new Long(1));
+        metaObject.setValue("updateUser",new Long(1));
     }
 
     @Override
     public void updateFill(MetaObject metaObject) {
         log.info("公共字段更新update");
-
+        //因为是更新，所以不用操作创建时间
+        //更新 更新的时间
+        metaObject.setValue("updateTime", LocalDateTime.now());
         log.info(metaObject.toString());
     }
 }
