@@ -12,7 +12,14 @@ public interface SetMealService extends IService<SetMeal> {
 
     boolean updateWithDish(SetMealDto setMealDto);
 
+    /**
+     * 实际就是保存dto数据，：保存setmeal，保存其他信息
+     * @param setMealDto
+     * @return
+     */
     boolean saveByIdWithSetMealDto(SetMealDto setMealDto);
 
     List<SetMeal> getListByCategoryIdWithSetMeal(String categoryId, Integer status);
+
+    boolean removeWithDish(List<Long> ids);
 }

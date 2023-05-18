@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 @Data
 @TableName("setmeal")
 public class SetMeal implements Serializable {
-
+//    套餐
     private static final long serialVersionUID = 1L;
 
     private Long id;

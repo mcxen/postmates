@@ -34,19 +34,17 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         // 返回值dishDto
         DishDto dishDto = new DishDto();
 
-        // 查询的菜品
+        // 查询的菜品基本的信息
         Dish dish = this.getById(id);
-
         // 查询菜品对应的口味列表
-        LambdaQueryWrapper<DishFlavor> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(DishFlavor::getDishId,id);
-        List<DishFlavor> list = dishFlavorService.list(queryWrapper);
-
+        LambdaQueryWrapper<DishFlavor> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(DishFlavor::getDishId,dish.getId());
+        //用于查询 DishFlavor 实体中 dishId 等于 dish.getId() 的记录。
+        List<DishFlavor> flavors = dishFlavorService.list(lambdaQueryWrapper);
         // 将菜品对应的属性赋值给返回对象
         BeanUtils.copyProperties(dish,dishDto);
         // 将口味列表赋值给返回对象
-        dishDto.setFlavors(list);
-
+        dishDto.setFlavors(flavors);
         return dishDto;
     }
 
@@ -67,5 +65,25 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         }).collect(Collectors.toList());
 
         dishFlavorService.saveBatch(flavors);//口味表只有name没有dishId
+    }
+
+    @Override
+    @Transactional
+    public void updateWithFlavor(DishDto dishDto) {
+        //更新菜品 update基本的信息
+        this.updateById(dishDto);//就可以了。
+        //清理口味 delete
+        LambdaQueryWrapper<DishFlavor> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(DishFlavor::getDishId,dishDto.getId());
+        dishFlavorService.remove(lambdaQueryWrapper);
+        //removeById清理的是dishFlvorID，不是dishId，现构造一个lambdaQueryWrapper
+        //清理的是等于dishId的部分的。
+        //添加口味 insert
+        List<DishFlavor> flavors = dishDto.getFlavors();
+        flavors = flavors.stream().map((item) -> {
+            item.setDishId(dishDto.getId());
+            return item;
+        }).collect(Collectors.toList());
+        dishFlavorService.saveBatch(flavors);
     }
 }

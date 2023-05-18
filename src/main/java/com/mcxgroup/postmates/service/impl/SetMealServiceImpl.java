@@ -2,6 +2,7 @@ package com.mcxgroup.postmates.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.mcxgroup.postmates.common.CustomException;
 import com.mcxgroup.postmates.dto.SetMealDto;
 import com.mcxgroup.postmates.service.CategoryService;
 import com.mcxgroup.postmates.entity.SetMealDish;
@@ -70,14 +71,12 @@ public class SetMealServiceImpl extends ServiceImpl<SetMealMapper, SetMeal> impl
     @Transactional
     public boolean saveByIdWithSetMealDto(SetMealDto setMealDto) {
         this.save(setMealDto);
-
         List<SetMealDish> setmealDishes = setMealDto.getSetmealDishes();
         List<SetMealDish> collect = setmealDishes.stream().map((item) -> {
             item.setSetmealId(setMealDto.getId());
             return item;
         }).collect(Collectors.toList());
         setMealDishService.saveBatch(collect);
-
         return true;
     }
 
@@ -87,6 +86,27 @@ public class SetMealServiceImpl extends ServiceImpl<SetMealMapper, SetMeal> impl
         queryWrapper.eq(SetMeal::getCategoryId,categoryId);
         queryWrapper.eq(status != null,SetMeal::getStatus,status);
         return this.list(queryWrapper);
+    }
+
+    @Override
+    public boolean removeWithDish(List<Long> ids) {
+        //查询状态
+        LambdaQueryWrapper<SetMeal> wrapper = new LambdaQueryWrapper<>();
+        wrapper.in(SetMeal::getId,ids);
+        wrapper.eq(SetMeal::getStatus,1);
+        int count = this.count(wrapper);//得到计数
+        //可以删除就删除套餐的数据 -- setmeal
+        if (count>0){
+            throw new CustomException("套餐正在售卖");
+        //    不能删除
+        }
+        this.removeByIds(ids);
+
+        //删除关系表的数据 SetMeal_Dish
+        LambdaQueryWrapper<SetMealDish> wrapper1 = new LambdaQueryWrapper<>();
+        wrapper1.in(SetMealDish::getSetmealId,ids);
+        setMealDishService.remove(wrapper1);
+        return true;
     }
 
 }
