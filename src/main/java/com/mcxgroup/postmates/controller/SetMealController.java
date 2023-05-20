@@ -3,10 +3,12 @@ package com.mcxgroup.postmates.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mcxgroup.postmates.common.R;
+import com.mcxgroup.postmates.dto.DishDto;
 import com.mcxgroup.postmates.dto.SetMealDto;
 import com.mcxgroup.postmates.entity.Category;
 import com.mcxgroup.postmates.entity.SetMeal;
 import com.mcxgroup.postmates.service.CategoryService;
+import com.mcxgroup.postmates.service.DishService;
 import com.mcxgroup.postmates.service.SetMealDishService;
 import com.mcxgroup.postmates.service.SetMealService;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +28,8 @@ public class SetMealController {
     private SetMealService setMealService;
     @Autowired
     private SetMealDishService setMealDishService;
-
+    @Autowired
+    private DishService dishService;
     @Autowired
     private CategoryService categoryService;
 
@@ -91,6 +94,10 @@ public class SetMealController {
             }
         }
         return R.success(statu==1?"启动成功":"禁售成功");
+    }
+    @GetMapping("/dish/{id}")
+    public R<DishDto> dish(@PathVariable String id){
+        return R.success(dishService.getByIdWithFlavor(id));
     }
 
 

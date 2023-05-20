@@ -96,3 +96,12 @@ public class CommonController {
 
 }
 ```
+
+
+
+### 手机端界面
+
+<img src="https://fastly.jsdelivr.net/gh/52chen/imagebed2023@main/uPic/IMG_B39088C71AD0-1.jpeg" alt="IMG_B39088C71AD0-1" style="zoom: 33%;" />
+
+
+

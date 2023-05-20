@@ -2,6 +2,7 @@ package com.mcxgroup.postmates.filter;
 
 import com.alibaba.fastjson.JSON;
 //import com.mcxgroup.postmates.common.BaseContext;
+import com.mcxgroup.postmates.common.BaseContext;
 import com.mcxgroup.postmates.common.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.AntPathMatcher;
@@ -61,7 +62,7 @@ public class LoginCheckFilter implements Filter {
             log.info("员工已登录，已放行....");
 
             // 将当前登录的员工id存入ThreadLocal
-//            BaseContext.setCurrentId((Long) employeeId);
+            BaseContext.setCurrentId((Long) employeeId);
 
             filterChain.doFilter(request,response);
             return;
@@ -72,8 +73,8 @@ public class LoginCheckFilter implements Filter {
         if (userId != null) {
             log.info("用户已登录，已放行....");
 
-            // 将当前登录的用户id存入ThreadLocal
-//            BaseContext.setCurrentId((Long) userId);
+//             将当前登录的用户id存入ThreadLocal
+            BaseContext.setCurrentId((Long) userId);
 
             filterChain.doFilter(request,response);
             return;

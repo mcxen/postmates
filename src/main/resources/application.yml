@@ -10,6 +10,14 @@ spring:
       url: jdbc:mysql://localhost:3306/postmates?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
       username: root # 数据库用户名
       password: Mysql2486    # 数据库密码
+  mail:
+    host: smtp.163.com
+    protocol: smtp
+    default-encoding: UTF-8
+    username: imsalt@163.com
+    password: shouquan2486
+    test-connection: true
+
 
 
 mybatis-plus:
