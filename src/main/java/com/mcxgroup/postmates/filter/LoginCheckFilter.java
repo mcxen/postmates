@@ -90,7 +90,6 @@ public class LoginCheckFilter implements Filter {
      * @param urls       放行的url
      * @param requestUri 请求的url
      * @Description: 检查路径是否匹配，以获得放行
-     * @Author:  <a href="https://www.MCXEN.com/">MCXEN</a>
      */
     public boolean check(String[] urls, String requestUri) {
         for (String url : urls) {
