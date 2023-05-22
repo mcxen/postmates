@@ -100,5 +100,17 @@ public class SetMealController {
         return R.success(dishService.getByIdWithFlavor(id));
     }
 
+    @GetMapping("/list")
+    public R<List<SetMeal>> list(SetMeal setmeal){
+        log.info("setmeal获取list{}:",setmeal);
+        //条件构造器
+        LambdaQueryWrapper<SetMeal> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.like(StringUtils.isNotEmpty(setmeal.getName()), SetMeal::getName, setmeal.getName());
+        queryWrapper.eq(null != setmeal.getCategoryId(), SetMeal::getCategoryId, setmeal.getCategoryId());
+        queryWrapper.eq(null != setmeal.getStatus(), SetMeal::getStatus, setmeal.getStatus());
+        queryWrapper.orderByDesc(SetMeal::getUpdateTime);
+
+        return R.success(setMealService.list(queryWrapper));
+    }
 
 }

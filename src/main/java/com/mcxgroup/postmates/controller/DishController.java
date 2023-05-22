@@ -59,8 +59,10 @@ public class DishController {
             BeanUtils.copyProperties(item,dishDto);
             Long categoryId = item.getCategoryId();
             Category category = categoryService.getById(categoryId);
-            String categoryName = category.getName();
-            dishDto.setCategoryName(categoryName);
+            if (category != null) {
+                String categoryName = category.getName();
+                dishDto.setCategoryName(categoryName);
+            }
             return dishDto;
         }).collect(Collectors.toList());
         pageDto.setRecords(list);

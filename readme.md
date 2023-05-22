@@ -105,3 +105,48 @@ public class CommonController {
 
 
 
+## 部分实现代码：
+
+### Dto方法实现分页信息详情
+
+
+
+```java
+@GetMapping("/userPage")
+public R<Page> page(int page,int pageSize){
+    // 使用dto的分页
+    log.info("展示订单order详情");
+    Page<Order> orderPage = new Page<>(page,pageSize);
+    Page<OrderDto> orderDtoPage = new Page<>(page,pageSize);
+    
+    //构造查询wrapper
+    LambdaQueryWrapper<Order> orderWrapper = new LambdaQueryWrapper<>();
+    orderWrapper.eq(Order::getUserId, BaseContext.getCurrentId());
+    orderWrapper.orderByDesc(Order::getOrderTime);
+  
+    // 注入orderPage
+    orderService.page(orderPage,orderWrapper);
+  
+    //对OrderDto进行需要的属性赋值
+    List<Order> records = orderPage.getRecords();
+    List<OrderDto> orderDtoList = records.stream().map((item) -> {
+        OrderDto orderDto = new OrderDto();
+        //此时的orderDto对象里面orderDetails属性还是空 下面准备为它赋值
+        Long orderId = item.getId();
+        LambdaQueryWrapper<OrderDetail> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(OrderDetail::getOrderId, orderId);
+        List<OrderDetail> list = orderDetailService.list(wrapper);
+      	//开始赋值
+        BeanUtils.copyProperties(item, orderDto);
+        orderDto.setOrderDetails(list);
+        return orderDto;
+    }).collect(Collectors.toList());
+    
+    BeanUtils.copyProperties(orderPage,orderDtoPage,"records");
+    orderDtoPage.setRecords(orderDtoList);
+    return R.success(orderDtoPage);
+}
+```
+
+
+

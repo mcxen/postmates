@@ -29,7 +29,7 @@ public class CategoryController {
         // 增加排序条件
         queryWrapper.orderByDesc(Category::getSort);
         categoryService.page(pageInfo,queryWrapper);
-        log.info(pageInfo.toString());
+        log.info("Category的控制器，page正在分页进行：{}",pageInfo.toString());
         return R.success(pageInfo);
     }
 
@@ -89,7 +89,8 @@ public class CategoryController {
         LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<>();
 
         queryWrapper.eq(type != null,Category::getType,type);
-
+        queryWrapper.orderByDesc(Category::getSort);
+        queryWrapper.orderByAsc(Category::getCreateTime);
         List<Category> list = categoryService.list(queryWrapper);
         return R.success(list);
     }

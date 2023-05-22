@@ -15,7 +15,7 @@ function orderListApi() {
   })
 }
 
-//分页查询订单
+//分页查询用户端的订单
 function orderPagingApi(data) {
   return $axios({
       'url': '/order/userPage',
