@@ -150,3 +150,165 @@ public R<Page> page(int page,int pageSize){
 
 
 
+### 购物车删掉商品
+
+
+
+```java
+@PostMapping("/sub")
+public R<String> subToCart(@RequestBody ShoppingCart shoppingCart) {
+    shoppingCart.setUserId(BaseContext.getCurrentId());
+    log.info(shoppingCart.getName()+"购物车中的数据:{}" , shoppingCart.toString());
+    if (shoppingCart.getSetmealId()!=null){
+        LambdaQueryWrapper<ShoppingCart> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ShoppingCart::getUserId,BaseContext.getCurrentId());//这里是锁定了哪一个顾客
+        wrapper.eq(ShoppingCart::getSetmealId,shoppingCart.getSetmealId());//这里是锁定哪一个菜
+        ShoppingCart one = shoppingCartService.getOne(wrapper);
+        if (one!=null){
+            if (one.getNumber()>1){
+                one.setNumber(one.getNumber()-1);//减去分数
+                shoppingCartService.updateById(one);
+            }else {
+                shoppingCartService.remove(wrapper);
+            }
+        }
+
+    }
+    if (shoppingCart.getDishId()!=null){
+        LambdaQueryWrapper<ShoppingCart> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ShoppingCart::getUserId,BaseContext.getCurrentId());//这里是锁定了哪一个顾客
+        wrapper.eq(ShoppingCart::getDishId,shoppingCart.getDishId());//这里是锁定哪一个菜
+        ShoppingCart one = shoppingCartService.getOne(wrapper);
+        if (one!=null){
+            if (one.getNumber()>1){
+                one.setNumber(one.getNumber()-1);//减去分数
+                shoppingCartService.updateById(one);
+            }else {
+                shoppingCartService.remove(wrapper);
+            }
+        }
+
+    }
+
+    return R.success("成功删减订单!");
+}
+```
+
+
+
+### 用户登录、退出、邮箱验证码功能
+
+
+
+`UserController.java`
+
+```java
+@Slf4j
+@RestController
+@RequestMapping("/user")
+public class UserController {
+
+    @Autowired
+    private UserService userService;
+
+//    @Autowired
+//    private RedisTemplate redisTemplate;
+
+    //实现邮箱登录
+    @PostMapping("/sendMsg")
+    public R<String> sendMsg(@RequestBody User user, HttpSession httpSession){
+        log.info("收到user请求 {}",user.getPhone());
+        String phone = user.getPhone();
+        String subjetc = "[PostMates] 登录验证码";
+        if (StringUtils.isNotEmpty(phone)){
+            String code = ValidateCodeUtils.generateValidateCode(4).toString();
+            // 默认设置一下，想要随机生成验证么就注释下一行
+            code = "8888";
+            String context = "[PostMates] 登录验证码为：【 "+code+" 】,五分钟内有效，请妥善保管";
+            log.info("code = {}",code);
+            // 默认设置一下，想要随机生成验证么就取消注释下一行
+//            userService.sendMsg(phone,subjetc,context);
+            httpSession.setAttribute(phone,code);
+            return R.success("验证码发送成功，请查收邮箱.");
+        }
+        return R.error("验证码发送失败");
+    }
+
+    @PostMapping("/login")
+    public R<User> login(@RequestBody Map map,HttpSession session){
+        log.info(map.toString());
+        //获得手机的验证码和手机号
+        String phone = map.get("phone").toString();
+        String code = map.get("code").toString();
+        Object codeInSession = session.getAttribute(phone);
+        if (codeInSession!=null && codeInSession.equals(code)){
+            //登录成功
+            LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(User::getPhone,phone);
+            User user = userService.getOne(wrapper);
+            if (user==null){
+                user = new User();//当前为新用户，直接注册一个
+                user.setPhone(phone);
+                user.setStatus(1);
+                user.setName(phone.substring(0,6));
+                userService.save(user);
+            }
+            session.setAttribute("user",user.getId());
+            log.info(user.getName()+"已经登录系统,ID为{}",user.getId());
+            BaseContext.setCurrentId(user.getId());
+            return R.success(user);
+        }
+        return R.error("登录失败");
+    }
+    @PostMapping("/logout")
+    public R<String> logout(HttpServletRequest request){
+        request.getSession().removeAttribute("user");
+        return R.success("已退出登录！！");
+    }
+
+}
+```
+
+
+
+`UserServiceImpl.java`
+
+
+
+```java
+@Service
+public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
+    @Value("${spring.mail.username}")
+    private String from;   // 邮件发送人
+
+    @Autowired
+    private JavaMailSender mailSender;
+
+    @Override
+    public void sendMsg(String to, String subject, String context) {
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setFrom(from);
+        mailMessage.setTo(to);
+        mailMessage.setSubject(subject);
+        mailMessage.setText(context);
+        // 真正的发送邮件操作，从 from到 to
+        mailSender.send(mailMessage);
+    }
+}
+```
+
+
+
+`Application.yml` 配置
+
+```yaml
+spring:
+	mail:
+    host: smtp.163.com
+    protocol: smtp
+    default-encoding: UTF-8
+    username: ****(AT)163.com
+    password: ***********
+    test-connection: true
+```
+

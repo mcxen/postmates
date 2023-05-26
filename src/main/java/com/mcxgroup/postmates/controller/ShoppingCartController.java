@@ -41,7 +41,8 @@ public class ShoppingCartController {
             shoppingCartServiceOne.setNumber(shoppingCartServiceOne.getNumber()+1);
             shoppingCartService.updateById(shoppingCartServiceOne);
         }else {
-            shoppingCartService.save(shoppingCart);
+            log.info("添加菜品，{}",shoppingCart.toString());
+            shoppingCartService.save(shoppingCart);//这里其实就是保存了
         }
         return R.success(shoppingCart);
     }

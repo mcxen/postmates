@@ -5,6 +5,7 @@ package com.mcxgroup.postmates.common;
  */
 public class BaseContext {
     private static ThreadLocal<Long> threadLocal = new ThreadLocal<>();
+    private static ThreadLocal<Long> threadLocal2 = new ThreadLocal<>();
 
     /**
      * 设置值
@@ -14,6 +15,9 @@ public class BaseContext {
     public static void setCurrentId(Long id) {
         threadLocal.set(id);
     }
+    public static void setCurrentEmpId(Long id) {
+        threadLocal2.set(id);
+    }
 
     /**
      * 获取值
@@ -22,5 +26,8 @@ public class BaseContext {
      */
     public static Long getCurrentId() {
         return threadLocal.get();
+    }
+    public static Long getCurrentEmpId() {
+        return threadLocal2.get();
     }
 }

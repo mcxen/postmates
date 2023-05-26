@@ -61,8 +61,8 @@ public class LoginCheckFilter implements Filter {
         if (employeeId != null) {
             log.info("员工已登录，已放行....");
 
-            // 将当前登录的员工id存入ThreadLocal
-            BaseContext.setCurrentId((Long) employeeId);
+//             将当前登录的员工id存入ThreadLocal
+            BaseContext.setCurrentEmpId((Long) employeeId);
 
             filterChain.doFilter(request,response);
             return;

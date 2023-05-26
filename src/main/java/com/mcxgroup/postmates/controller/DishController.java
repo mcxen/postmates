@@ -2,6 +2,7 @@ package com.mcxgroup.postmates.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mcxgroup.postmates.common.BaseContext;
 import com.mcxgroup.postmates.common.R;
 import com.mcxgroup.postmates.dto.DishDto;
 import com.mcxgroup.postmates.entity.Category;
@@ -133,6 +134,7 @@ public class DishController {
         //其中R表示响应对象，DishDto是传输数据对象(DTO)的类型。
         //根据id查询菜品信息和口味信息
         DishDto dishDto = dishService.getByIdWithFlavor(String.valueOf(id));
+        log.info("返回菜品的dishDto的Flavors{}: "+dishDto.getFlavors().toString());
         return R.success(dishDto);
     }
 
@@ -144,9 +146,7 @@ public class DishController {
     @PostMapping("/status/{status}")
     public R<String> status(@PathVariable Integer status,@RequestParam List<Long> ids){
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
-
         queryWrapper.in(ids != null,Dish::getId,ids);
-
         List<Dish> list = dishService.list(queryWrapper);
 
         for (Dish dish : list) {
@@ -164,6 +164,7 @@ public class DishController {
         //服务端接口需要使用 @RequestBody 注解，告诉 Spring MVC 框架该方法需要从请求体中读取数据，
         // 并将其转换为 Java 对象。
         //需要保存： 口味和Dish菜品
+        log.info(BaseContext.getCurrentEmpId()+"员工请求修改菜品,菜品信息为：{}",dishDto.toString());
         dishService.updateWithFlavor(dishDto);
         return R.success("修改菜品成功");
     }

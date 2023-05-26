@@ -61,8 +61,8 @@ public class OrderServiceImp extends ServiceImpl<OrderMapper,Order> implements O
             orderDetail.setOrderId(orderId);
             orderDetail.setName(item.getName());
             orderDetail.setImage(item.getImage());
-            // 设置用户名
-            orderDetail.setName(user.getName());
+            // 这里应该是设置菜的，而不是用户名
+//            orderDetail.setName(user.getName());
             orderDetail.setDishId(item.getDishId());
             orderDetail.setSetmealId(item.getSetmealId());
             orderDetail.setDishFlavor(item.getDishFlavor());

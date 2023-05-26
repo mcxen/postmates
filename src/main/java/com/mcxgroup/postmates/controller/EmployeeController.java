@@ -2,6 +2,7 @@ package com.mcxgroup.postmates.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mcxgroup.postmates.common.BaseContext;
 import com.mcxgroup.postmates.common.R;
 import com.mcxgroup.postmates.entity.Employee;
 import com.mcxgroup.postmates.service.EmployeeService;
@@ -57,6 +58,8 @@ public class EmployeeController {
 
         //6、登录成功，将员工id存入Session并返回登录成功结果
         request.getSession().setAttribute("employee", emp.getId());
+        log.info(emp.getName()+"已经登录系统,ID为{}",emp.getId());
+        BaseContext.setCurrentEmpId(emp.getId());//存入ThreadLocal
         return R.success(emp);
     }
 
@@ -68,6 +71,7 @@ public class EmployeeController {
     @PostMapping("/logout")
     public R<String> logout(HttpServletRequest request) {
         request.getSession().removeAttribute("employee");
+//        BaseContext.setCurrentEmpId((long) -1);
         return R.success("退出成功");
     }
 

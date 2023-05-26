@@ -1,6 +1,7 @@
 package com.mcxgroup.postmates.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mcxgroup.postmates.common.BaseContext;
 import com.mcxgroup.postmates.common.R;
@@ -15,6 +16,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,16 +44,18 @@ public class OrderController {
         wrapper.like(number!=null,Order::getNumber,number);
         wrapper.gt(StringUtils.isNotEmpty(beginTime),Order::getOrderTime,beginTime);
         wrapper.lt(StringUtils.isNotEmpty(endTime),Order::getOrderTime,endTime);
+        wrapper.orderByDesc(Order::getOrderTime);
         orderService.page(orderPage,wrapper);
         return R.success(orderPage);
     }
     @PutMapping
-    public R<Order> updateStatus(Order order){
+    public R<Order> updateStatus(@RequestBody Order order){
         Integer status = order.getStatus();
-        if (status == null) {
-            order.setStatus(3);
-        }
+//        if (status != null) {
+//            order.setStatus(3);
+//        }
         orderService.updateById(order);
+        log.info("订单修改状态，{}",order.toString());
         return R.success(order);
     }
 
@@ -85,5 +89,14 @@ public class OrderController {
         BeanUtils.copyProperties(orderPage,orderDtoPage,"records");
         orderDtoPage.setRecords(orderDtoList);
         return R.success(orderDtoPage);
+    }
+
+    @PostMapping("/again")
+    public R<Order> again(@RequestBody Order order){
+        Order newOrder = orderService.getById(order.getId());//上一单
+        log.info(newOrder.toString());
+        newOrder.setStatus(1);
+        orderService.submit(newOrder);
+        return R.success(newOrder);
     }
 }
