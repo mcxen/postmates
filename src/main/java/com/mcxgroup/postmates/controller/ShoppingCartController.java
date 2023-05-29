@@ -33,7 +33,8 @@ public class ShoppingCartController {
         wrapper.eq(ShoppingCart::getUserId,shoppingCart.getUserId());
         wrapper.eq(ShoppingCart::getSetmealId,shoppingCart.getSetmealId());
         wrapper.eq(ShoppingCart::getDishId,shoppingCart.getDishId());
-        wrapper.eq(ShoppingCart::getDishFlavor,shoppingCart.getDishFlavor());
+        wrapper.eq(ShoppingCart::getDishFlavor,shoppingCart.getDishFlavor());//这是为了保证不同口味不同保存的效果
+
         //在购物车中查询
         ShoppingCart shoppingCartServiceOne = shoppingCartService.getOne(wrapper);
         // 购物车存在该菜品，则仅增加该菜品的数量即可

@@ -17,6 +17,10 @@ spring:
     username: imsalt@163.com
     password: shouquan2486
     test-connection: true
+  redis:
+    host: 127.0.0.1
+    port: 6379
+
 
 
 

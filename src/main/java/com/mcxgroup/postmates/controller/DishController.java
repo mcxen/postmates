@@ -7,6 +7,7 @@ import com.mcxgroup.postmates.common.R;
 import com.mcxgroup.postmates.dto.DishDto;
 import com.mcxgroup.postmates.entity.Category;
 import com.mcxgroup.postmates.entity.Dish;
+import com.mcxgroup.postmates.entity.DishFlavor;
 import com.mcxgroup.postmates.service.CategoryService;
 import com.mcxgroup.postmates.service.DishFlavorService;
 import com.mcxgroup.postmates.service.DishService;
@@ -168,14 +169,42 @@ public class DishController {
         dishService.updateWithFlavor(dishDto);
         return R.success("修改菜品成功");
     }
-    @GetMapping("/list")
-    public R<List<Dish>> list(Dish dish){
-        LambdaQueryWrapper<Dish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.eq(dish.getCategoryId()!=null,Dish::getCategoryId,dish.getCategoryId());
-        lambdaQueryWrapper.eq(Dish::getStatus,1);
-        lambdaQueryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
-        List<Dish> list = dishService.list(lambdaQueryWrapper);
-        return R.success(list);
-    }
+//    @GetMapping("/list")
+//    public R<List<Dish>> list(Dish dish){
+//        LambdaQueryWrapper<Dish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+//        lambdaQueryWrapper.eq(dish.getCategoryId()!=null,Dish::getCategoryId,dish.getCategoryId());
+//        lambdaQueryWrapper.eq(Dish::getStatus,1);
+//        lambdaQueryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
+//        List<Dish> list = dishService.list(lambdaQueryWrapper);
+//        return R.success(list);
+//    }
+@GetMapping("/list")
+public R<List<DishDto>> list(Dish dish){
+        //这是追加的数据，原先的后台的数据格式加了一些数据，后台不受影响
+    LambdaQueryWrapper<Dish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+    lambdaQueryWrapper.eq(dish.getCategoryId()!=null,Dish::getCategoryId,dish.getCategoryId());
+    lambdaQueryWrapper.eq(Dish::getStatus,1);
+    //排序
+    lambdaQueryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
+    List<Dish> dishlist = dishService.list(lambdaQueryWrapper);
+    //将dish转化成DishDto
+    List<DishDto> list = dishlist.stream().map((item)->{
+        DishDto dishDto = new DishDto();
+        BeanUtils.copyProperties(item,dishDto);
+        Long categoryId = item.getCategoryId();
+        Category category = categoryService.getById(categoryId);
+        if (category != null) {
+            String categoryName = category.getName();
+            dishDto.setCategoryName(categoryName);
+        }
+        Long dishId = item.getId();//菜品的Id
+        LambdaQueryWrapper<DishFlavor> wrapper = new LambdaQueryWrapper<>();//dishFlavor
+        wrapper.eq(DishFlavor::getDishId,dishId);
+        List<DishFlavor> dishFlavorList = dishFlavorService.list(wrapper);
+        dishDto.setFlavors(dishFlavorList);//设置菜品口味。
+        return dishDto;
+    }).collect(Collectors.toList());
+    return R.success(list);
+}
 
 }
