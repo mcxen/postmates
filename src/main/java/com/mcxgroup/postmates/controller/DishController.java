@@ -15,11 +15,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @RestController
@@ -27,6 +27,9 @@ import java.util.stream.Collectors;
 @RequestMapping("/dish")
 public class DishController {
     //
+
+    @Autowired
+    private RedisTemplate redisTemplate;
     @Autowired
     private DishService dishService;
     @Autowired
@@ -41,6 +44,9 @@ public class DishController {
         //需要保存： 口味和Dish菜品
         log.info(dishDto.toString());//参数正确了
         dishService.saveWithFlavor(dishDto);
+        //清理缓存数据
+        Set keys = redisTemplate.keys("dish_*");
+        redisTemplate.delete(keys);
         return R.success("新增菜品成功");
     }
 
@@ -167,6 +173,9 @@ public class DishController {
         //需要保存： 口味和Dish菜品
         log.info(BaseContext.getCurrentEmpId()+"员工请求修改菜品,菜品信息为：{}",dishDto.toString());
         dishService.updateWithFlavor(dishDto);
+        //清理缓存数据
+        Set keys = redisTemplate.keys("dish_*");
+        redisTemplate.delete(keys);
         return R.success("修改菜品成功");
     }
 //    @GetMapping("/list")
@@ -180,7 +189,16 @@ public class DishController {
 //    }
 @GetMapping("/list")
 public R<List<DishDto>> list(Dish dish){
+
         //这是追加的数据，原先的后台的数据格式加了一些数据，后台不受影响
+    //先从Redis中获取菜品数据，如果有则直接返回，无需查询数据库;
+    List<DishDto> list = null; //提前这个list
+    String key = "dish_" +dish.getCategoryId()+"_"+dish.getStatus();//dish_***_1;
+    list = (List<DishDto>) redisTemplate.opsForValue().get(key);
+    if (list != null) {
+        log.info("从redis获得了DishDto数据：{}",list.toString());
+        return R.success(list);
+    }
     LambdaQueryWrapper<Dish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
     lambdaQueryWrapper.eq(dish.getCategoryId()!=null,Dish::getCategoryId,dish.getCategoryId());
     lambdaQueryWrapper.eq(Dish::getStatus,1);
@@ -188,7 +206,7 @@ public R<List<DishDto>> list(Dish dish){
     lambdaQueryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
     List<Dish> dishlist = dishService.list(lambdaQueryWrapper);
     //将dish转化成DishDto
-    List<DishDto> list = dishlist.stream().map((item)->{
+    list = dishlist.stream().map((item)->{
         DishDto dishDto = new DishDto();
         BeanUtils.copyProperties(item,dishDto);
         Long categoryId = item.getCategoryId();
@@ -204,6 +222,8 @@ public R<List<DishDto>> list(Dish dish){
         dishDto.setFlavors(dishFlavorList);//设置菜品口味。
         return dishDto;
     }).collect(Collectors.toList());
+    // 如果没有则查询数据库，并将查询到的菜品数据放入Redis。
+    redisTemplate.opsForValue().set(key,list,60, TimeUnit.MINUTES);//直接缓存
     return R.success(list);
 }
 
