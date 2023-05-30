@@ -15,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,6 +36,7 @@ public class SetMealController {
     private CategoryService categoryService;
 
     @PostMapping
+    @CacheEvict(value = "setmealCache",allEntries = true)
     public R<String> save(@RequestBody SetMealDto setMealDto){
         log.info("套餐信息：{}",setMealDto.toString());
         setMealService.saveByIdWithSetMealDto(setMealDto);
@@ -74,6 +77,7 @@ public class SetMealController {
     }
 
     @DeleteMapping
+    @CacheEvict(value = "setmealCache",allEntries = true)
     public R<String> delete(@RequestParam("ids") List<Long> ids){
         //http://localhost:8080/setmeal?ids=1415580119015145474
         //删除的参数是ids是HTTP请求参数.
@@ -101,6 +105,7 @@ public class SetMealController {
     }
 
     @GetMapping("/list")
+    @Cacheable(value = "setmealCache",key = "#setmeal.categoryId+'_'+#setmeal.status")
     public R<List<SetMeal>> list(SetMeal setmeal){
         log.info("setmeal获取list{}:",setmeal);
         //条件构造器

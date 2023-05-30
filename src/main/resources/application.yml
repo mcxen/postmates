@@ -20,6 +20,11 @@ spring:
   redis:
     host: 127.0.0.1
     port: 6379
+  cache:
+    redis:
+      time-to-live: 1800000
+#      三十分钟过期
+
 
 
 

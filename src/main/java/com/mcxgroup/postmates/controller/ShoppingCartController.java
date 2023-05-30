@@ -30,11 +30,15 @@ public class ShoppingCartController {
         //增加购物车的物品
         shoppingCart.setUserId(BaseContext.getCurrentId());
         LambdaQueryWrapper<ShoppingCart> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(ShoppingCart::getUserId,shoppingCart.getUserId());
-        wrapper.eq(ShoppingCart::getSetmealId,shoppingCart.getSetmealId());
-        wrapper.eq(ShoppingCart::getDishId,shoppingCart.getDishId());
-        wrapper.eq(ShoppingCart::getDishFlavor,shoppingCart.getDishFlavor());//这是为了保证不同口味不同保存的效果
-
+        if (shoppingCart.getDishId()!=null){
+            wrapper.eq(ShoppingCart::getUserId,shoppingCart.getUserId());
+            wrapper.eq(ShoppingCart::getDishId,shoppingCart.getDishId());
+            wrapper.eq(shoppingCart.getDishFlavor()!=null,ShoppingCart::getDishFlavor,shoppingCart.getDishFlavor());
+            //这是为了保证不同口味不同保存的效果
+        }else {
+            wrapper.eq(ShoppingCart::getUserId,shoppingCart.getUserId());
+            wrapper.eq(ShoppingCart::getSetmealId,shoppingCart.getSetmealId());
+        }
         //在购物车中查询
         ShoppingCart shoppingCartServiceOne = shoppingCartService.getOne(wrapper);
         // 购物车存在该菜品，则仅增加该菜品的数量即可
@@ -57,6 +61,7 @@ public class ShoppingCartController {
             LambdaQueryWrapper<ShoppingCart> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(ShoppingCart::getUserId,BaseContext.getCurrentId());//这里是锁定了哪一个顾客
             wrapper.eq(ShoppingCart::getSetmealId,shoppingCart.getSetmealId());//这里是锁定哪一个菜
+//            wrapper.eq(ShoppingCart::getDishId,shoppingCart.getDishId());
             ShoppingCart one = shoppingCartService.getOne(wrapper);
             if (one!=null){
                 if (one.getNumber()>1){
