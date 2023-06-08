@@ -4,10 +4,12 @@ spring:
   application:
     #应用的名称，可选
     name: postmates
+#    下面先改成docker的数据库试试
+
   datasource:
     druid:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://localhost:3306/postmates?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+      url: jdbc:mysql://localhost:3339/postmates?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
       username: root # 数据库用户名
       password: Mysql2486    # 数据库密码
   mail:
