@@ -47,6 +47,10 @@ public class LoginCheckFilter implements Filter {
                 "/employee/logout", // 员工注册
                 "/user/login",      // 用户登录
                 "/user/sendMsg",    // 发送验证码
+                "/doc.html",
+                "/webjars/**",
+                "/swagger-resources",
+                "/v2/api-docs"
         };
 
         // 匹配成功,直接放行

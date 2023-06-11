@@ -1,5 +1,5 @@
 # PostMates - 外卖后台管理
-项目基于 Spring boot, Mybatis plus, JDBC, Spring MVC等框架，搭建类似于PostMates的的外卖后台模块。
+项目基于 Spring boot, Mybatis plus, JDBC, Spring MVC, ElementUI，等框架，搭建类似于PostMates的的外卖后台模块。
 
 
 ![截屏2023-05-16 19.55.10](https://fastly.jsdelivr.net/gh/52chen/imagebed2023@main/uPic/截屏2023-05-16%2019.55.10.png)
