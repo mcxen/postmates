@@ -1,5 +1,5 @@
 # PostMates - 外卖后台管理
-项目基于 Spring boot, Mybatis plus, JDBC, Spring MVC, ElementUI，等框架，搭建类似于PostMates的的外卖后台模块。
+项目基于 Spring boot, Mybatis plus, JDBC, Spring MVC等框架，搭建类似于PostMates的的外卖后台模块。
 
 
 ![截屏2023-05-16 19.55.10](https://fastly.jsdelivr.net/gh/52chen/imagebed2023@main/uPic/截屏2023-05-16%2019.55.10.png)
@@ -102,6 +102,18 @@ public class CommonController {
 ### 手机端界面
 
 <img src="https://fastly.jsdelivr.net/gh/52chen/imagebed2023@main/uPic/IMG_B39088C71AD0-1.jpeg" alt="IMG_B39088C71AD0-1" style="zoom: 33%;" />
+
+
+
+### Swagger Api管理端：
+
+
+
+![截屏2023-06-11 10.07.38](https://fastly.jsdelivr.net/gh/52chen/imagebed2023@main/uPic/%E6%88%AA%E5%B1%8F2023-06-11%2010.07.38.png)
+
+http://localhost:8080/doc.html#/home
+
+
 
 
 
@@ -299,16 +311,52 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
 
 
+### Redis缓存数据
+
 `Application.yml` 配置
 
 ```yaml
+server:
+  port: 8080
 spring:
-	mail:
+  application:
+    #应用的名称，可选
+    name: postmates
+#    下面先改成docker的数据库试试
+
+  datasource:
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3339/postmates?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+      username: root # 数据库用户名
+      password: Mysql2486    # 数据库密码
+  mail:
     host: smtp.163.com
     protocol: smtp
     default-encoding: UTF-8
-    username: ****(AT)163.com
+    username: ims**@163.com
     password: ***********
     test-connection: true
+  redis:
+    host: 127.0.0.1
+    port: 6379
+  cache:
+    redis:
+      time-to-live: 1800000
+#      三十分钟过期
+
+
+mybatis-plus:
+  configuration:
+    #在映射实体或者属性时，将数据库中表名和字段名中的下划线去掉，按照驼峰命名法映射
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: ASSIGN_ID
+# 外卖项目的图片存放地址
+takeout-food:
+  # 这里目前使用的是是绝对路径
+  images: /Users/mcxw/Downloads/postmates/static/upload/
 ```
 
